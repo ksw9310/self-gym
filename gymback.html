@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GymBack</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0A0A0A; --card: #161616; --card2: #1E1E1E; --border: #2A2A2A;
+  --primary: #C8FF00; --primary-dim: rgba(200,255,0,0.12);
+  --text: #F0F0F0; --muted: #666;
+  --green: #4ADE80; --orange: #FB923C; --red: #F87171;
+}
+body {
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100dvh; max-width: 480px; margin: 0 auto;
+  overflow-x: hidden;
+}
+.screen { display: none; min-height: 100dvh; padding-bottom: 80px; }
+.screen.active { display: block; }
+
+/* Header */
+.hdr {
+  padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--bg); z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+.hdr-title { font-size: 18px; font-weight: 700; }
+.hdr-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* Cards */
+.card {
+  background: var(--card); border-radius: 16px; padding: 18px 16px;
+  margin: 0 14px 10px; border: 1px solid var(--border);
+}
+
+/* Buttons */
+.btn {
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.75; }
+.btn-primary { background: var(--primary); color: #0A0A0A; }
+.btn-ghost { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
+.btn-back { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; padding: 0 12px 0 0; line-height: 1; }
+
+/* Bottom Nav */
+.nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  background: rgba(22,22,22,0.95); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border); display: flex; z-index: 100;
+}
+.nav-btn {
+  flex: 1; padding: 10px 0 20px; border: none; background: none; color: var(--muted);
+  font-size: 11px; cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; transition: color 0.15s;
+}
+.nav-btn.active { color: var(--primary); }
+.nav-icon { font-size: 22px; }
+
+/* Input */
+.inp {
+  width: 100%; background: var(--card2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 14px; color: var(--text);
+  font-size: 16px; -webkit-appearance: none;
+}
+.inp:focus { outline: none; border-color: var(--primary); }
+.inp-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+
+/* Section title */
+.sec { font-size: 12px; color: var(--muted); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; padding: 18px 18px 8px; }
+
+/* Phase badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+
+/* Progress bar */
+.prog { height: 3px; background: var(--card2); border-radius: 2px; margin: 0 14px 14px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--primary); border-radius: 2px; transition: width 0.3s; }
+
+/* Set row */
+.set-row {
+  display: grid; grid-template-columns: 26px 1fr 20px 1fr 34px;
+  align-items: center; gap: 8px; padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+.set-row:last-of-type { border-bottom: none; }
+.set-num {
+  width: 26px; height: 26px; border-radius: 7px; background: var(--card2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+}
+.set-row.done .set-num { background: var(--primary-dim); color: var(--primary); }
+.set-inp {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 9px 6px; color: var(--text); font-size: 15px; font-weight: 600;
+  text-align: center; width: 100%; -webkit-appearance: none;
+}
+.set-inp:focus { outline: none; border-color: var(--primary); }
+.set-inp:disabled { opacity: 0.5; }
+.set-x { color: var(--muted); font-size: 14px; text-align: center; }
+.set-check {
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border);
+  background: none; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: all 0.15s; font-size: 14px;
+}
+.set-check.on { background: var(--primary); border-color: var(--primary); color: #0A0A0A; }
+
+/* History row */
+.hist-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.hist-icon {
+  width: 44px; height: 44px; border-radius: 12px; background: var(--card2);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+
+/* Tip */
+.tip {
+  background: var(--primary-dim); border: 1px solid rgba(200,255,0,0.15);
+  border-radius: 10px; padding: 9px 12px; font-size: 12px; color: var(--primary); margin-top: 8px;
+}
+
+/* Prev record */
+.prev { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+/* Stat grid */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 14px 12px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; text-align: center;
+}
+.stat-val { font-size: 26px; font-weight: 800; color: var(--primary); }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* Misc */
+.center { display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 60vh; text-align: center; padding: 30px 20px; }
+.emoji-lg { font-size: 60px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="s-setup" class="screen active">
+  <div style="padding:50px 20px 20px;text-align:center">
+    <div style="font-size:52px;margin-bottom:14px">🏋️</div>
+    <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">GymBack</div>
+    <div style="font-size:14px;color:var(--muted);margin-top:8px;line-height:1.6">
+      6개월 공백 후 스마트하게 복귀하는<br>개인 트레이닝 플래너
+    </div>
+  </div>
+  <div id="setup-body"></div>
+</div>
+
+<!-- TODAY -->
+<div id="s-today" class="screen">
+  <div class="hdr">
+    <div>
+      <div class="hdr-title">오늘의 운동</div>
+      <div class="hdr-sub" id="today-date"></div>
+    </div>
+    <div id="today-phase"></div>
+  </div>
+  <div id="today-body"></div>
+</div>
+
+<!-- WORKOUT -->
+<div id="s-workout" class="screen">
+  <div class="hdr">
+    <button class="btn-back" onclick="backFromWorkout()">←</button>
+    <div style="flex:1">
+      <div class="hdr-title" id="wo-title"></div>
+      <div class="hdr-sub" id="wo-prog-txt"></div>
+    </div>
+    <div id="wo-timer" style="font-size:15px;font-weight:700;color:var(--primary)">0:00</div>
+  </div>
+  <div class="prog"><div class="prog-fill" id="wo-prog-bar" style="width:0%"></div></div>
+  <div id="wo-body"></div>
+</div>
+
+<!-- HISTORY -->
+<div id="s-history" class="screen">
+  <div class="hdr"><div class="hdr-title">운동 기록</div></div>
+  <div id="hist-body"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="s-settings" class="screen">
+  <div class="hdr"><div class="hdr-title">설정</div></div>
+  <div id="set-body"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav" style="display:none">
+  <button class="nav-btn active" id="nav-today" onclick="go('today')">
+    <span class="nav-icon">🏠</span><span>오늘</span>
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="go('history')">
+    <span class="nav-icon">📊</span><span>기록</span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="go('settings')">
+    <span class="nav-icon">⚙️</span><span>설정</span>
+  </button>
+</nav>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────
+const WO = {
+  upperA: {
+    id:'upperA', name:'Upper A', sub:'밀기 중심', icon:'💪',
+    ex:[
+      {id:'bench',      name:'벤치프레스',               tip:'견갑골 고정, 바 경로 일직선'},
+      {id:'incline',    name:'인클라인 덤벨 프레스',       tip:'45도 각도, 가슴 스트레치 느끼기'},
+      {id:'shoulder',   name:'숄더 프레스 (덤벨)',         tip:'코어 브레이싱, 허리 과신전 금지'},
+      {id:'lateral',    name:'케이블 사이드 레터럴',        tip:'팔꿈치 약간 구부린 채 올리기'},
+      {id:'tricep',     name:'트라이셉스 푸시다운',         tip:'팔꿈치 고정'}
+    ]
+  },
+  lowerA: {
+    id:'lowerA', name:'Lower A', sub:'전면 허벅지 중심', icon:'🦵',
+    ex:[
+      {id:'squat',      name:'스쿼트',                   tip:'폼 완벽히 체크, 무릎이 발끝 방향으로'},
+      {id:'legpress',   name:'레그 프레스',               tip:'발 위치 조정 후 무릎 방향 확인'},
+      {id:'bulgarian',  name:'불가리안 스플릿 스쿼트',      tip:'밸런스 잡으며 천천히', note:'각 다리'},
+      {id:'legext',     name:'레그 익스텐션',              tip:'완전 가동범위'},
+      {id:'calf1',      name:'카프 레이즈',               tip:'최하단에서 스트레치'}
+    ]
+  },
+  upperB: {
+    id:'upperB', name:'Upper B', sub:'당기기 중심', icon:'🏋️',
+    ex:[
+      {id:'row',        name:'바벨 로우',                 tip:'허리 중립, 견갑골 당기기'},
+      {id:'pulldown',   name:'랫 풀다운',                 tip:'가슴까지, 날개뼈 수축'},
+      {id:'cablerow',   name:'시티드 케이블 로우',          tip:'후면 삼각근·광배근'},
+      {id:'curl',       name:'덤벨 컬',                   tip:'이두 최대 수축'},
+      {id:'facepull',   name:'페이스 풀',                 tip:'어깨 건강, 외회전근'}
+    ]
+  },
+  lowerB: {
+    id:'lowerB', name:'Lower B', sub:'후면 사슬 중심', icon:'🔥',
+    ex:[
+      {id:'rdl',        name:'루마니안 데드리프트',          tip:'햄스트링 스트레치, 허리 아치 유지'},
+      {id:'legcurl',    name:'레그 컬 (머신)',              tip:'완전 가동범위'},
+      {id:'hipthrust',  name:'힙 쓰러스트',                tip:'힙 최대 수축'},
+      {id:'calf2',      name:'카프 레이즈 (앉아서)',         tip:'비복근·가자미근 분리'}
+    ]
+  }
+};
+
+const SCHED = ['upperA','lowerA','rest','upperB','lowerB','rest','rest'];
+
+// sets per exercise per phase [phase][workoutId][exIdx]
+const SETS = {
+  1: {upperA:[3,2,2,2,2], lowerA:[3,2,2,2,3], upperB:[3,2,2,2,2], lowerB:[3,2,2,3]},
+  2: {upperA:[4,3,3,3,3], lowerA:[4,3,3,3,3], upperB:[4,3,3,3,3], lowerB:[4,3,3,3]},
+  3: {upperA:[4,4,4,3,3], lowerA:[4,4,4,4,3], upperB:[4,4,4,4,3], lowerB:[4,4,4,3]}
+};
+
+const PHASE = {
+  1:{name:'적응기',  wk:'1~2주차', col:'#4ADE80', reps:'12~15', note:'이전 무게의 50~60%', pct:0.55},
+  2:{name:'빌딩기',  wk:'3~4주차', col:'#FB923C', reps:'8~12',  note:'이전 무게의 65~75%', pct:0.70},
+  3:{name:'정상훈련', wk:'5주차~',  col:'#F87171', reps:'6~10',  note:'RPE 8~9, 점진적 과부하', pct:0.85}
+};
+
+const MAIN_LIFTS = [
+  {id:'bench',  name:'벤치프레스',       icon:'🏋️'},
+  {id:'squat',  name:'스쿼트',           icon:'🦵'},
+  {id:'rdl',    name:'데드리프트 / RDL',  icon:'🔥'},
+  {id:'row',    name:'바벨 로우',         icon:'💪'}
+];
+
+// ─── STATE ───────────────────────────────────────────────────────
+let ST = {
+  settings: null,   // {startDate, prevWeights:{}, manualPhase:null}
+  history:  [],     // [{id,date,workoutId,phase,timerSec,exercises:{id:[{w,r,done}]}}]
+  active:   null,   // current workout session
+  timer:    null,
+  timerSec: 0,
+  step:     1       // setup step
+};
+
+// ─── STORAGE ─────────────────────────────────────────────────────
+function load() {
+  try {
+    const s = localStorage.getItem('gb_s');
+    const h = localStorage.getItem('gb_h');
+    ST.settings = s ? JSON.parse(s) : null;
+    ST.history  = h ? JSON.parse(h) : [];
+  } catch(e) { ST.settings = null; ST.history = []; }
+}
+function saveST() { localStorage.setItem('gb_s', JSON.stringify(ST.settings)); }
+function saveH()  { localStorage.setItem('gb_h', JSON.stringify(ST.history)); }
+
+// ─── UTIL ─────────────────────────────────────────────────────────
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+}
+function p2(n) { return String(n).padStart(2,'0'); }
+
+function daysSince(dateStr) {
+  const s = new Date(dateStr); const t = new Date(today());
+  const sd = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+  const td = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  return Math.floor((td - sd) / 86400000);
+}
+
+function getPhase() {
+  if (!ST.settings) return 1;
+  if (ST.settings.manualPhase) return ST.settings.manualPhase;
+  const w = Math.floor(daysSince(ST.settings.startDate) / 7) + 1;
+  return w <= 2 ? 1 : w <= 4 ? 2 : 3;
+}
+
+function getTodayWo() {
+  if (!ST.settings) return null;
+  const d = daysSince(ST.settings.startDate);
+  return SCHED[((d % 7) + 7) % 7];
+}
+
+function getWeek() { return Math.floor(daysSince(ST.settings.startDate) / 7) + 1; }
+
+function fmtDate(s) {
+  const d = new Date(s);
+  return `${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+
+function fmtTime(sec) {
+  return `${Math.floor(sec/60)}:${p2(sec%60)}`;
+}
+
+function recWeight(exId, phase) {
+  const prev = ST.settings?.prevWeights?.[exId];
+  if (!prev) return null;
+  return Math.round(prev * PHASE[phase].pct / 2.5) * 2.5;
+}
+
+function lastRecord(woId) {
+  for (let i = ST.history.length-1; i >= 0; i--)
+    if (ST.history[i].workoutId === woId) return ST.history[i];
+  return null;
+}
+
+function fmtSets(arr) {
+  if (!arr?.length) return '';
+  const done = arr.filter(s => s.done);
+  return done.length ? done.map(s=>`${s.w}×${s.r}`).join(' / ') : '';
+}
+
+function totalVol(record) {
+  return Object.values(record.exercises)
+    .reduce((a, sets) => a + sets.filter(s=>s.done).reduce((b,s)=>b+s.w*s.r,0), 0);
+}
+
+function doneSetsCount(record) {
+  return Object.values(record.exercises).reduce((a,sets)=>a+sets.filter(s=>s.done).length,0);
+}
+
+// ─── ROUTING ─────────────────────────────────────────────────────
+let curScreen = 'setup';
+
+function showScr(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`s-${name}`).classList.add('active');
+  const nav = document.getElementById('main-nav');
+  if (['today','history','settings'].includes(name)) {
+    nav.style.display = 'flex';
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const nb = document.getElementById(`nav-${name}`);
+    if (nb) nb.classList.add('active');
+  } else {
+    nav.style.display = 'none';
+  }
+  curScreen = name;
+  window.scrollTo(0,0);
+}
+
+function go(screen) {
+  if (screen === 'today')    { renderToday();    showScr('today'); }
+  if (screen === 'history')  { renderHistory();  showScr('history'); }
+  if (screen === 'settings') { renderSettings(); showScr('settings'); }
+}
+
+// ─── SETUP ───────────────────────────────────────────────────────
+function renderSetup() {
+  showScr('setup');
+  const b = document.getElementById('setup-body');
+
+  if (ST.step === 1) {
+    b.innerHTML = `
+      <div class="card">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px">시작일 설정</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">오늘 시작하거나, 이미 시작했다면 그 날짜로</div>
+        <div class="inp-label">시작일</div>
+        <input type="date" id="inp-start" class="inp" value="${today()}" max="${today()}">
+      </div>
+      <div style="margin:14px">
+        <button class="btn btn-primary" onclick="setupNext()">다음 →</button>
+      </div>`;
+  } else {
+    b.innerHTML = `
+      <div class="card">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px">이전 작업 무게 입력 <span style="color:var(--muted);font-weight:400;font-size:12px">(선택)</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">공백 전 마지막으로 들던 무게를 입력하면 페이즈별 추천 무게를 자동 계산해드려요</div>
+        ${MAIN_LIFTS.map(l=>`
+          <div style="margin-bottom:12px">
+            <div class="inp-label">${l.icon} ${l.name}</div>
+            <div style="position:relative">
+              <input type="number" id="pw-${l.id}" class="inp" placeholder="입력 없으면 건너뜀" min="0" step="2.5" style="padding-right:46px">
+              <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">kg</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="margin:14px;display:flex;gap:10px">
+        <button class="btn btn-ghost" onclick="ST.step=1;renderSetup()" style="flex:1">← 뒤로</button>
+        <button class="btn btn-primary" onclick="setupFinish()" style="flex:2">시작하기 🚀</button>
+      </div>`;
+  }
+}
+
+function setupNext() {
+  const v = document.getElementById('inp-start').value;
+  if (!v) { alert('시작일을 선택해주세요'); return; }
+  ST._date = v; ST.step = 2; renderSetup();
+}
+
+function setupFinish() {
+  const pw = {};
+  MAIN_LIFTS.forEach(l => {
+    const v = parseFloat(document.getElementById(`pw-${l.id}`)?.value);
+    if (v > 0) pw[l.id] = v;
+  });
+  ST.settings = { startDate: ST._date, prevWeights: pw, manualPhase: null };
+  saveST();
+  go('today');
+}
+
+// ─── TODAY ───────────────────────────────────────────────────────
+function renderToday() {
+  const phase = getPhase();
+  const pi = PHASE[phase];
+  const woId = getTodayWo();
+  const wk = getWeek();
+  const d = new Date();
+
+  document.getElementById('today-date').textContent = `${d.getMonth()+1}월 ${d.getDate()}일 · ${wk}주차`;
+  document.getElementById('today-phase').innerHTML =
+    `<span class="badge" style="background:${pi.col}20;color:${pi.col}">P${phase} ${pi.name}</span>`;
+
+  const b = document.getElementById('today-body');
+
+  if (woId === 'rest') {
+    b.innerHTML = `
+      <div class="center">
+        <div class="emoji-lg">😴</div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:8px">오늘은 휴식일</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7">근육 성장은 운동이 아닌<br>회복하는 동안 일어납니다<br>잘 쉬고 단백질을 챙기세요</div>
+        <div style="margin-top:24px;padding:14px 20px;background:var(--card);border-radius:14px;border:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--muted)">다음 운동</div>
+          <div style="font-weight:700;margin-top:4px">${nextWoLabel()}</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const wo = WO[woId];
+  const last = lastRecord(woId);
+  const doneToday = ST.history.some(h => h.date === today() && h.workoutId === woId);
+
+  let html = `
+    <div class="card" style="border-color:${pi.col}30">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="font-size:28px">${wo.icon}</div>
+        <div>
+          <div style="font-size:20px;font-weight:800">${wo.name}</div>
+          <div style="font-size:13px;color:var(--muted)">${wo.sub}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:var(--card2);border-radius:8px;padding:5px 10px;font-size:12px">📊 ${pi.reps}회</span>
+        <span style="background:var(--card2);border-radius:8px;padding:5px 10px;font-size:12px">⚖️ ${pi.note}</span>
+      </div>
+    </div>
+    <div class="sec">오늘의 운동 목록</div>`;
+
+  wo.ex.forEach((ex, i) => {
+    const sets = (SETS[phase][woId] || [])[i] || 3;
+    const rw = recWeight(ex.id, phase);
+    const prevSets = last?.exercises?.[ex.id];
+    const prevStr = fmtSets(prevSets);
+    html += `
+      <div class="card" style="padding:14px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-weight:600;font-size:14px">${ex.name}${ex.note?` <span style="font-size:11px;color:var(--muted)">(${ex.note})</span>`:''}</span>
+          <span style="font-size:12px;color:var(--muted)">${sets}세트 × ${pi.reps}회</span>
+        </div>
+        ${rw ? `<div style="font-size:12px;color:var(--primary);margin-top:4px">추천 ${rw}kg (이전의 ${Math.round(pi.pct*100)}%)</div>` : ''}
+        ${prevStr ? `<div class="prev">지난 기록: ${prevStr}</div>` : ''}
+      </div>`;
+  });
+
+  if (doneToday) {
+    html += `
+      <div style="margin:14px;padding:20px;background:var(--card);border-radius:14px;border:1px solid var(--border);text-align:center">
+        <div style="font-size:28px">✅</div>
+        <div style="font-weight:700;margin-top:8px">오늘 운동 완료!</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">기록 탭에서 오늘 기록을 확인하세요</div>
+      </div>`;
+  } else {
+    html += `
+      <div style="margin:14px">
+        <button class="btn btn-primary" onclick="startWo('${woId}')">🚀 운동 시작</button>
+      </div>`;
+  }
+
+  b.innerHTML = html;
+}
+
+function nextWoLabel() {
+  const d = daysSince(ST.settings.startDate);
+  for (let i = 1; i <= 7; i++) {
+    const idx = ((d + i) % 7 + 7) % 7;
+    if (SCHED[idx] !== 'rest') {
+      const w = WO[SCHED[idx]];
+      return `${w.icon} ${w.name} (${i===1?'내일':i+'일 후'})`;
+    }
+  }
+  return '';
+}
+
+// ─── WORKOUT SESSION ─────────────────────────────────────────────
+function startWo(woId) {
+  const phase = getPhase();
+  const wo = WO[woId];
+  const last = lastRecord(woId);
+
+  ST.active = {
+    woId, phase,
+    exercises: wo.ex.map((ex, i) => {
+      const sc = (SETS[phase][woId] || [])[i] || 3;
+      const rw = recWeight(ex.id, phase) || '';
+      const prevSets = last?.exercises?.[ex.id] || [];
+      return {
+        ...ex,
+        sets: Array.from({length: sc}, (_, si) => ({
+          w: prevSets[si]?.w || rw || '',
+          r: prevSets[si]?.r || PHASE[phase].reps.split('~')[0] || '',
+          done: false
+        })),
+        prevSets
+      };
+    })
+  };
+
+  ST.timerSec = 0;
+  if (ST.timer) clearInterval(ST.timer);
+  ST.timer = setInterval(() => {
+    ST.timerSec++;
+    const el = document.getElementById('wo-timer');
+    if (el) el.textContent = fmtTime(ST.timerSec);
+  }, 1000);
+
+  renderWo();
+  showScr('workout');
+}
+
+function renderWo() {
+  const aw = ST.active;
+  if (!aw) return;
+  const wo = WO[aw.woId];
+
+  document.getElementById('wo-title').textContent = `${wo.icon} ${wo.name}`;
+
+  const done = aw.exercises.reduce((a,ex) => a+ex.sets.filter(s=>s.done).length, 0);
+  const total = aw.exercises.reduce((a,ex) => a+ex.sets.length, 0);
+  document.getElementById('wo-prog-txt').textContent = `${done} / ${total} 세트 완료`;
+  document.getElementById('wo-prog-bar').style.width = total ? `${done/total*100}%` : '0%';
+
+  let html = '';
+  aw.exercises.forEach((ex, ei) => {
+    const allDone = ex.sets.every(s => s.done);
+    html += `
+      <div class="card" style="${allDone?'opacity:0.65;':''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <span style="font-weight:700;font-size:15px">${ex.name}</span>
+            ${ex.note ? `<span style="font-size:11px;color:var(--muted);margin-left:4px">(${ex.note})</span>` : ''}
+          </div>
+          ${allDone ? '<span style="color:var(--green);font-size:18px">✓</span>' : ''}
+        </div>
+        <div style="display:grid;grid-template-columns:26px 1fr 20px 1fr 34px;gap:8px;padding-bottom:6px;margin-bottom:2px;border-bottom:1px solid var(--border)">
+          <span></span>
+          <span style="text-align:center;font-size:10px;color:var(--muted)">무게 (kg)</span>
+          <span></span>
+          <span style="text-align:center;font-size:10px;color:var(--muted)">횟수</span>
+          <span></span>
+        </div>`;
+
+    ex.sets.forEach((set, si) => {
+      const prev = ex.prevSets?.[si];
+      html += `
+        <div class="set-row${set.done?' done':''}" id="sr-${ei}-${si}">
+          <div class="set-num">${si+1}</div>
+          <input class="set-inp" type="number" min="0" step="0.5"
+            value="${set.w}" placeholder="${prev?.w||''}"
+            oninput="upd(${ei},${si},'w',this.value)"
+            ${set.done?'disabled':''}>
+          <span class="set-x">×</span>
+          <input class="set-inp" type="number" min="0" step="1"
+            value="${set.r}" placeholder="${prev?.r||''}"
+            oninput="upd(${ei},${si},'r',this.value)"
+            ${set.done?'disabled':''}>
+          <button class="set-check${set.done?' on':''}" onclick="toggleSet(${ei},${si})">
+            ${set.done?'✓':''}
+          </button>
+        </div>`;
+    });
+
+    const prevStr = fmtSets(ex.prevSets);
+    if (prevStr) html += `<div class="prev">지난 기록: ${prevStr}</div>`;
+    html += `<div class="tip">💡 ${ex.tip}</div></div>`;
+  });
+
+  const allDone = aw.exercises.every(ex => ex.sets.every(s => s.done));
+  html += `
+    <div style="margin:14px">
+      <button class="btn ${allDone?'btn-primary':'btn-ghost'}" onclick="finishWo()">
+        ${allDone ? '🎉 운동 완료!' : '종료 및 기록 저장'}
+      </button>
+    </div>`;
+
+  document.getElementById('wo-body').innerHTML = html;
+}
+
+function upd(ei, si, field, val) {
+  if (ST.active) ST.active.exercises[ei].sets[si][field] = field==='w' ? parseFloat(val)||'' : parseInt(val)||'';
+}
+
+function toggleSet(ei, si) {
+  const set = ST.active.exercises[ei].sets[si];
+  if (!set.done) {
+    if (!set.w && !set.r) { alert('무게와 횟수를 입력해주세요'); return; }
+    // save current input values from DOM before toggling
+    const wInp = document.querySelector(`#sr-${ei}-${si} .set-inp:first-of-type`);
+    const rInp = document.querySelector(`#sr-${ei}-${si} .set-inp:last-of-type`);
+    if (wInp) set.w = parseFloat(wInp.value)||set.w;
+    if (rInp) set.r = parseInt(rInp.value)||set.r;
+  }
+  set.done = !set.done;
+  renderWo();
+}
+
+function backFromWorkout() {
+  if (!confirm('운동을 중단할까요? 기록은 저장되지 않습니다.')) return;
+  if (ST.timer) { clearInterval(ST.timer); ST.timer = null; }
+  ST.active = null;
+  go('today');
+}
+
+function finishWo() {
+  const aw = ST.active;
+  const done = aw.exercises.reduce((a,ex)=>a+ex.sets.filter(s=>s.done).length,0);
+  if (done === 0) { alert('최소 1세트 이상 완료해야 저장할 수 있어요'); return; }
+  if (ST.timer) { clearInterval(ST.timer); ST.timer = null; }
+
+  const record = {
+    id: Date.now(), date: today(), workoutId: aw.woId,
+    phase: aw.phase, timerSec: ST.timerSec, exercises: {}
+  };
+  aw.exercises.forEach(ex => {
+    record.exercises[ex.id] = ex.sets.map(s => ({w:parseFloat(s.w)||0, r:parseInt(s.r)||0, done:s.done}));
+  });
+
+  ST.history.push(record);
+  saveH();
+  ST.active = null;
+  showComplete(record);
+}
+
+function showComplete(rec) {
+  const wo = WO[rec.workoutId];
+  const ds = doneSetsCount(rec);
+  const vol = Math.round(totalVol(rec));
+
+  document.getElementById('today-body').innerHTML = `
+    <div class="center" style="min-height:80vh">
+      <div class="emoji-lg">🎉</div>
+      <div style="font-size:26px;font-weight:800;margin-bottom:6px">운동 완료!</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:28px">${wo.icon} ${wo.name}</div>
+      <div class="stat-grid" style="width:100%">
+        <div class="stat-card">
+          <div class="stat-val">${fmtTime(rec.timerSec)}</div>
+          <div class="stat-lbl">운동 시간</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${ds}</div>
+          <div class="stat-lbl">완료 세트</div>
+        </div>
+        <div class="stat-card" style="grid-column:1/-1">
+          <div class="stat-val">${vol.toLocaleString()}</div>
+          <div class="stat-lbl">총 볼륨 (kg)</div>
+        </div>
+      </div>
+      <div style="margin-top:20px;width:100%;max-width:280px">
+        <button class="btn btn-primary" onclick="go('today')">홈으로 돌아가기</button>
+      </div>
+    </div>`;
+  showScr('today');
+  document.getElementById('main-nav').style.display = 'flex';
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────
+function renderHistory() {
+  const b = document.getElementById('hist-body');
+  if (!ST.history.length) {
+    b.innerHTML = `
+      <div class="center">
+        <div class="emoji-lg">📋</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px">아직 기록이 없어요</div>
+        <div style="font-size:13px;color:var(--muted)">운동을 완료하면 여기에 쌓여요</div>
+      </div>`;
+    return;
+  }
+
+  const sorted = [...ST.history].reverse();
+  let html = '';
+  let lastDate = '';
+
+  sorted.forEach(rec => {
+    const wo = WO[rec.workoutId];
+    if (rec.date !== lastDate) {
+      html += `<div class="sec">${fmtDate(rec.date)}</div>`;
+      lastDate = rec.date;
+    }
+    const ds = doneSetsCount(rec);
+    const vol = Math.round(totalVol(rec));
+    html += `
+      <div class="hist-row" onclick="showHistDetail(${rec.id})">
+        <div class="hist-icon">${wo?.icon||'🏋️'}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${wo?.name||rec.workoutId}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">
+            ${ds}세트 · ${vol.toLocaleString()}kg · ${fmtTime(rec.timerSec||0)}
+          </div>
+        </div>
+        <span style="color:var(--muted);font-size:18px">›</span>
+      </div>`;
+  });
+
+  b.innerHTML = html;
+}
+
+function showHistDetail(id) {
+  const rec = ST.history.find(h => h.id === id);
+  if (!rec) return;
+  const wo = WO[rec.workoutId];
+
+  let html = `
+    <div class="hdr" style="position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border)">
+      <button class="btn-back" onclick="go('history')">←</button>
+      <div style="flex:1">
+        <div class="hdr-title">${wo?.icon} ${wo?.name}</div>
+        <div class="hdr-sub">${fmtDate(rec.date)} · ${fmtTime(rec.timerSec||0)}</div>
+      </div>
+    </div>`;
+
+  const ds = doneSetsCount(rec); const vol = Math.round(totalVol(rec));
+  html += `
+    <div class="stat-grid" style="margin-top:14px">
+      <div class="stat-card"><div class="stat-val">${ds}</div><div class="stat-lbl">완료 세트</div></div>
+      <div class="stat-card"><div class="stat-val">${vol.toLocaleString()}</div><div class="stat-lbl">총 볼륨(kg)</div></div>
+    </div>`;
+
+  if (wo) {
+    wo.ex.forEach(ex => {
+      const sets = rec.exercises[ex.id]?.filter(s => s.done);
+      if (!sets?.length) return;
+      html += `
+        <div class="card">
+          <div style="font-weight:700;margin-bottom:10px">${ex.name}</div>
+          ${sets.map((s,i) => `
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--muted);font-size:13px">세트 ${i+1}</span>
+              <span style="font-weight:600">${s.w}kg × ${s.r}회</span>
+              <span style="color:var(--muted);font-size:12px">${Math.round(s.w*s.r)}kg</span>
+            </div>`).join('')}
+        </div>`;
+    });
+  }
+
+  document.getElementById('hist-body').innerHTML = html;
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────
+function renderSettings() {
+  const phase = getPhase();
+  const pi = PHASE[phase];
+  const wk = getWeek();
+
+  document.getElementById('set-body').innerHTML = `
+    <div class="sec">현재 상태</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="color:var(--muted);font-size:14px">시작일</span>
+        <span style="font-weight:600">${fmtDate(ST.settings.startDate)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="color:var(--muted);font-size:14px">진행 주차</span>
+        <span style="font-weight:600">${wk}주차 (${daysSince(ST.settings.startDate)+1}일차)</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:var(--muted);font-size:14px">현재 페이즈</span>
+        <span class="badge" style="background:${pi.col}20;color:${pi.col}">P${phase} ${pi.name}</span>
+      </div>
+    </div>
+
+    <div class="sec">페이즈 수동 변경</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">자동 계산 대신 직접 페이즈를 설정할 수 있어요</div>
+      <div style="display:flex;gap:8px">
+        ${[1,2,3].map(p => `
+          <button onclick="setPhase(${p})" style="flex:1;padding:12px 6px;border-radius:10px;
+            border:2px solid ${phase===p?PHASE[p].col:'var(--border)'};
+            background:${phase===p?PHASE[p].col+'18':'transparent'};
+            color:${phase===p?PHASE[p].col:'var(--muted)'};
+            font-weight:700;cursor:pointer;font-size:13px;line-height:1.5">
+            P${p}<br><span style="font-size:11px;font-weight:400">${PHASE[p].name}</span>
+          </button>`).join('')}
+      </div>
+      ${ST.settings.manualPhase ? `
+        <button onclick="setPhase(null)" style="margin-top:10px;width:100%;padding:10px;border-radius:10px;
+          border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:13px">
+          자동 계산으로 돌아가기
+        </button>` : ''}
+    </div>
+
+    <div class="sec">이전 작업 무게 수정</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">수정하면 추천 무게가 다시 계산돼요</div>
+      ${MAIN_LIFTS.map(l=>`
+        <div style="margin-bottom:12px">
+          <div class="inp-label">${l.icon} ${l.name}</div>
+          <div style="position:relative">
+            <input type="number" class="inp" value="${ST.settings.prevWeights?.[l.id]||''}"
+              placeholder="미입력" min="0" step="2.5" style="padding-right:46px"
+              onchange="updPW('${l.id}',this.value)">
+            <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">kg</span>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="sec">초기화</div>
+    <div style="margin:0 14px 14px">
+      <button class="btn btn-danger" onclick="resetApp()">⚠️ 앱 초기화 (모든 데이터 삭제)</button>
+    </div>`;
+}
+
+function setPhase(p) {
+  ST.settings.manualPhase = p;
+  saveST();
+  renderSettings();
+}
+
+function updPW(id, val) {
+  if (!ST.settings.prevWeights) ST.settings.prevWeights = {};
+  const v = parseFloat(val);
+  if (v > 0) ST.settings.prevWeights[id] = v; else delete ST.settings.prevWeights[id];
+  saveST();
+}
+
+function resetApp() {
+  if (!confirm('모든 기록과 설정이 삭제됩니다. 정말 초기화할까요?')) return;
+  localStorage.removeItem('gb_s');
+  localStorage.removeItem('gb_h');
+  ST.settings = null; ST.history = []; ST.step = 1;
+  renderSetup();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+load();
+if (ST.settings) go('today');
+else { ST.step = 1; renderSetup(); }
+</script>
+</body>
+</html>
