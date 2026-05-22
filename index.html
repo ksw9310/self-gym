@@ -222,24 +222,32 @@ const WO = {
     ex:[
       {id:'bench', name:'벤치프레스', tip:'견갑골 고정, 바 경로 일직선', main:true},
       {pool:[
-        {id:'incline',     name:'인클라인 덤벨 프레스', tip:'45도 각도, 가슴 스트레치'},
-        {id:'incline_bar', name:'인클라인 바벨 프레스', tip:'중간 그립, 가슴 상부 집중'},
-        {id:'cable_fly',   name:'케이블 크로스오버',   tip:'수평 내전, 팔꿈치 살짝 굽히기'},
+        {id:'incline',        name:'인클라인 덤벨 프레스', tip:'45도 각도, 가슴 스트레치'},
+        {id:'incline_bar',    name:'인클라인 바벨 프레스', tip:'중간 그립, 가슴 상부 집중'},
+        {id:'cable_fly',      name:'케이블 크로스오버',    tip:'수평 내전, 팔꿈치 살짝 굽히기'},
+        {id:'machine_chest',  name:'머신 체스트 프레스',   tip:'안정 자세, 가슴 수축에 집중'},
+        {id:'dip_chest',      name:'딥스 (가슴 강조)',     tip:'상체 앞으로 기울이기, 팔꿈치 벌리기'},
       ]},
       {pool:[
-        {id:'shoulder', name:'숄더 프레스 (덤벨)',    tip:'코어 브레이싱, 허리 과신전 금지'},
-        {id:'ohp',      name:'오버헤드 프레스 (바벨)', tip:'코어 단단히, 바를 얼굴 앞으로'},
-        {id:'arnold',   name:'아놀드 프레스',         tip:'회전하며 올리기, 전면 삼각근'},
+        {id:'shoulder',   name:'숄더 프레스 (덤벨)',    tip:'코어 브레이싱, 허리 과신전 금지'},
+        {id:'ohp',        name:'오버헤드 프레스 (바벨)', tip:'코어 단단히, 바를 얼굴 앞으로'},
+        {id:'arnold',     name:'아놀드 프레스',         tip:'회전하며 올리기, 전면 삼각근'},
+        {id:'machine_sp', name:'머신 숄더 프레스',      tip:'어깨 정렬, 팔꿈치 90도'},
+        {id:'landmine',   name:'랜드마인 프레스',       tip:'한쪽씩, 어깨 회전 가동범위', note:'각 팔'},
       ]},
       {pool:[
-        {id:'lateral',     name:'케이블 사이드 레터럴',   tip:'팔꿈치 약간 구부린 채 올리기'},
-        {id:'db_lateral',  name:'덤벨 사이드 레터럴',    tip:'엄지 아래, 팔꿈치 주도'},
-        {id:'upright_row', name:'업라이트 로우 (케이블)', tip:'팔꿈치 높이 올리기, 어깨너비 그립'},
+        {id:'lateral',         name:'케이블 사이드 레터럴', tip:'팔꿈치 약간 구부린 채 올리기'},
+        {id:'db_lateral',      name:'덤벨 사이드 레터럴',  tip:'엄지 아래, 팔꿈치 주도'},
+        {id:'upright_row',     name:'업라이트 로우 (케이블)', tip:'팔꿈치 높이 올리기, 어깨너비 그립'},
+        {id:'machine_lateral', name:'머신 레터럴 레이즈',   tip:'팔꿈치로 밀어내기, 안정적 자세'},
+        {id:'rear_delt_fly',   name:'리어 델트 플라이',     tip:'후면 삼각근, 견갑골 당기지 않기'},
       ]},
       {pool:[
-        {id:'tricep',      name:'트라이셉스 푸시다운', tip:'팔꿈치 고정, 완전 신전'},
-        {id:'tricep_oh',   name:'오버헤드 트라이셉스', tip:'팔꿈치 안으로, 스트레치 극대화'},
-        {id:'tricep_kick', name:'덤벨 킥백',          tip:'전완 수평, 완전 신전', note:'각 팔'},
+        {id:'tricep',       name:'트라이셉스 푸시다운',     tip:'팔꿈치 고정, 완전 신전'},
+        {id:'tricep_oh',    name:'오버헤드 트라이셉스',     tip:'팔꿈치 안으로, 스트레치 극대화'},
+        {id:'tricep_kick',  name:'덤벨 킥백',              tip:'전완 수평, 완전 신전', note:'각 팔'},
+        {id:'skullcrusher', name:'스컬 크러셔 (EZ바)',     tip:'팔꿈치 고정, 천천히 내리기'},
+        {id:'close_bench',  name:'클로즈 그립 벤치 프레스', tip:'어깨너비, 팔꿈치 몸 가까이'},
       ]},
     ]
   },
@@ -248,18 +256,24 @@ const WO = {
     ex:[
       {id:'squat', name:'스쿼트', tip:'폼 완벽히 체크, 무릎이 발끝 방향으로', main:true},
       {pool:[
-        {id:'legpress',   name:'레그 프레스',   tip:'발 위치 조정 후 무릎 방향 확인'},
-        {id:'hack_squat', name:'핵 스쿼트',     tip:'무릎 추적, 깊이 있게'},
-        {id:'goblet',     name:'고블릿 스쿼트', tip:'덤벨 들고, 무릎 바깥으로'},
+        {id:'legpress',    name:'레그 프레스',     tip:'발 위치 조정 후 무릎 방향 확인'},
+        {id:'hack_squat',  name:'핵 스쿼트',       tip:'무릎 추적, 깊이 있게'},
+        {id:'goblet',      name:'고블릿 스쿼트',   tip:'덤벨 들고, 무릎 바깥으로'},
+        {id:'front_squat', name:'프론트 스쿼트',   tip:'팔꿈치 높게, 상체 수직'},
+        {id:'smith_squat', name:'스미스 머신 스쿼트', tip:'발 살짝 앞쪽, 대퇴사두 집중'},
       ]},
       {pool:[
         {id:'bulgarian', name:'불가리안 스플릿 스쿼트', tip:'밸런스 잡으며 천천히', note:'각 다리'},
         {id:'lunge',     name:'워킹 런지 (덤벨)',      tip:'앞발 무릎 90도, 몸통 수직', note:'각 다리'},
-        {id:'rev_lunge', name:'리버스 런지 (덤벨)',     tip:'뒷발 밀어내기, 앞 허벅지 집중', note:'각 다리'},
+        {id:'rev_lunge', name:'리버스 런지 (덤벨)',    tip:'뒷발 밀어내기, 앞 허벅지 집중', note:'각 다리'},
+        {id:'side_lunge',name:'사이드 런지 (덤벨)',    tip:'엉덩이 뒤로 빼며 옆으로 내려가기', note:'각 다리'},
+        {id:'box_step',  name:'박스 스텝업 (덤벨)',    tip:'앞 다리로만 밀어 올리기', note:'각 다리'},
       ]},
       {pool:[
-        {id:'legext',  name:'레그 익스텐션',  tip:'완전 가동범위, 수축 1초 유지'},
-        {id:'step_up', name:'스텝업 (덤벨)', tip:'발 전체로 밟기, 앞 다리로 밀기', note:'각 다리'},
+        {id:'legext',      name:'레그 익스텐션',    tip:'완전 가동범위, 수축 1초 유지'},
+        {id:'step_up',     name:'스텝업 (덤벨)',   tip:'발 전체로 밟기, 앞 다리로 밀기', note:'각 다리'},
+        {id:'sissy_squat', name:'시시 스쿼트',     tip:'무릎 앞으로, 대퇴사두 스트레치'},
+        {id:'wall_sit',    name:'월 싯 홀드',      tip:'허벅지 수평, 30~60초 버티기'},
       ]},
       {id:'calf1', name:'카프 레이즈 (선 자세)', tip:'최하단에서 스트레치, 발 정면'},
     ]
@@ -269,19 +283,25 @@ const WO = {
     ex:[
       {id:'row', name:'바벨 로우', tip:'허리 중립, 견갑골 당기기', main:true},
       {pool:[
-        {id:'pulldown',   name:'랫 풀다운',           tip:'가슴까지, 날개뼈 수축'},
-        {id:'pullup',     name:'풀업 / 친업',          tip:'완전 신전 → 완전 수축'},
-        {id:'cable_pull', name:'스트레이트 암 풀다운',  tip:'팔 편 채 광배근으로 당기기'},
+        {id:'pulldown',       name:'랫 풀다운',           tip:'가슴까지, 날개뼈 수축'},
+        {id:'pullup',         name:'풀업 / 친업',          tip:'완전 신전 → 완전 수축'},
+        {id:'cable_pull',     name:'스트레이트 암 풀다운',  tip:'팔 편 채 광배근으로 당기기'},
+        {id:'pulldown_under', name:'언더그립 랫 풀다운',    tip:'어깨너비, 이두·하부 광배근'},
+        {id:'v_bar_pull',     name:'V바 풀다운',           tip:'좁은 그립, 광배근 두께 집중'},
       ]},
       {pool:[
-        {id:'cablerow', name:'시티드 케이블 로우', tip:'후면 삼각근·광배근'},
-        {id:'db_row',   name:'원암 덤벨 로우',     tip:'로테이션 없이 팔꿈치로 당기기', note:'각 팔'},
-        {id:'tbar_row', name:'T바 로우',           tip:'가슴 지지, 날개뼈 수축'},
+        {id:'cablerow',    name:'시티드 케이블 로우',     tip:'후면 삼각근·광배근'},
+        {id:'db_row',      name:'원암 덤벨 로우',         tip:'로테이션 없이 팔꿈치로 당기기', note:'각 팔'},
+        {id:'tbar_row',    name:'T바 로우',              tip:'가슴 지지, 날개뼈 수축'},
+        {id:'chest_row',   name:'체스트 서포티드 로우',   tip:'가슴 지지 머신, 등 고립'},
+        {id:'pendlay_row', name:'펜들레이 로우',          tip:'바를 바닥에 매번 놓기, 폭발적'},
       ]},
       {pool:[
-        {id:'curl',     name:'덤벨 컬',  tip:'이두 최대 수축, 팔꿈치 고정'},
-        {id:'bar_curl', name:'바벨 컬',  tip:'상완 고정, 완전 수축'},
-        {id:'hammer',   name:'해머 컬',  tip:'중립 그립, 상완근·이두 자극'},
+        {id:'curl',          name:'덤벨 컬',         tip:'이두 최대 수축, 팔꿈치 고정'},
+        {id:'bar_curl',      name:'바벨 컬',         tip:'상완 고정, 완전 수축'},
+        {id:'hammer',        name:'해머 컬',         tip:'중립 그립, 상완근·이두 자극'},
+        {id:'preacher_curl', name:'프리처 컬 (EZ바)', tip:'상완 고정, 하부 이두 자극'},
+        {id:'incline_curl',  name:'인클라인 덤벨 컬', tip:'팔꿈치 뒤로, 이두 장두 스트레치', note:'각 팔'},
       ]},
       {id:'facepull', name:'페이스 풀', tip:'어깨 건강, 외회전근 활성화'},
     ]
@@ -294,11 +314,15 @@ const WO = {
         {id:'legcurl',     name:'레그 컬 (누워서)', tip:'완전 가동범위, 수축 유지'},
         {id:'legcurl_sit', name:'레그 컬 (앉아서)', tip:'엉덩이 굴곡 자세, 긴 가동범위'},
         {id:'nordic',      name:'노르딕 컬',        tip:'천천히 내려가기, 편심 집중'},
+        {id:'ghr',         name:'글루트 햄 레이즈', tip:'발 고정, 햄스트링·둔근 동시 자극'},
+        {id:'stiff_dl',    name:'스티프 레그 데드', tip:'무릎 거의 펴고, 햄스트링 스트레치'},
       ]},
       {pool:[
-        {id:'hipthrust',  name:'힙 쓰러스트',    tip:'힙 최대 수축, 허리 과신전 금지'},
-        {id:'cable_kick', name:'케이블 킥백',     tip:'힙 익스텐션, 둔근 수축', note:'각 다리'},
-        {id:'sumo_dl',    name:'스모 데드리프트', tip:'넓은 스탠스, 내전근 자극'},
+        {id:'hipthrust',  name:'힙 쓰러스트',     tip:'힙 최대 수축, 허리 과신전 금지'},
+        {id:'cable_kick', name:'케이블 킥백',      tip:'힙 익스텐션, 둔근 수축', note:'각 다리'},
+        {id:'sumo_dl',    name:'스모 데드리프트',  tip:'넓은 스탠스, 내전근 자극'},
+        {id:'conv_dl',    name:'컨벤셔널 데드',    tip:'어깨너비 스탠스, 전신 사슬'},
+        {id:'back_ext',   name:'백 익스텐션 (로딩)', tip:'허리 중립, 둔근 수축'},
       ]},
       {id:'calf2', name:'카프 레이즈 (앉아서)', tip:'비복근·가자미근 분리 자극'},
     ]
@@ -326,46 +350,73 @@ const SETS = {
 // 서브 운동 → 메인 무게 기반 추천 비율 (직접 입력 없을 때 자동 계산)
 const EX_BASE = {
   // ── Upper A (bench 기반) ──
-  incline:     {base:'bench', ratio:0.35},  // 덤벨 per hand
-  incline_bar: {base:'bench', ratio:0.82},  // 바벨
-  cable_fly:   {base:'bench', ratio:0.22},  // 케이블 per side
-  shoulder:    {base:'bench', ratio:0.45},  // 덤벨 per hand
-  ohp:         {base:'bench', ratio:0.62},  // 바벨
-  arnold:      {base:'bench', ratio:0.40},  // 덤벨 per hand
-  lateral:     {base:'bench', ratio:0.10},  // 케이블 per side
-  db_lateral:  {base:'bench', ratio:0.08},  // 덤벨 per hand
-  upright_row: {base:'bench', ratio:0.35},
-  tricep:      {base:'bench', ratio:0.20},
-  tricep_oh:   {base:'bench', ratio:0.18},
-  tricep_kick: {base:'bench', ratio:0.12},  // 덤벨 per hand
+  incline:        {base:'bench', ratio:0.35},  // 덤벨 per hand
+  incline_bar:    {base:'bench', ratio:0.82},  // 바벨
+  cable_fly:      {base:'bench', ratio:0.22},  // 케이블 per side
+  machine_chest:  {base:'bench', ratio:0.70},  // 머신 (양손 총중량)
+  dip_chest:      {base:'bench', ratio:null},  // 맨몸
+  shoulder:       {base:'bench', ratio:0.45},  // 덤벨 per hand
+  ohp:            {base:'bench', ratio:0.62},  // 바벨
+  arnold:         {base:'bench', ratio:0.40},  // 덤벨 per hand
+  machine_sp:     {base:'bench', ratio:0.50},  // 머신
+  landmine:       {base:'bench', ratio:0.30},  // 한손 (각 팔)
+  lateral:        {base:'bench', ratio:0.10},  // 케이블 per side
+  db_lateral:     {base:'bench', ratio:0.08},  // 덤벨 per hand
+  upright_row:    {base:'bench', ratio:0.35},
+  machine_lateral:{base:'bench', ratio:0.15},  // 머신 per side
+  rear_delt_fly:  {base:'bench', ratio:0.12},  // 머신/덤벨
+  tricep:         {base:'bench', ratio:0.20},
+  tricep_oh:      {base:'bench', ratio:0.18},
+  tricep_kick:    {base:'bench', ratio:0.12},  // 덤벨 per hand
+  skullcrusher:   {base:'bench', ratio:0.32},  // EZ바
+  close_bench:    {base:'bench', ratio:0.75},  // 클로즈 그립 바벨
+
   // ── Lower A (squat 기반) ──
   legpress:    {base:'squat', ratio:2.20},
   hack_squat:  {base:'squat', ratio:0.88},
   goblet:      {base:'squat', ratio:0.25},  // 덤벨 1개
+  front_squat: {base:'squat', ratio:0.78},  // 바벨
+  smith_squat: {base:'squat', ratio:0.85},  // 스미스 머신
   bulgarian:   {base:'squat', ratio:0.30},  // 덤벨 per hand
   lunge:       {base:'squat', ratio:0.25},  // 덤벨 per hand
   rev_lunge:   {base:'squat', ratio:0.25},  // 덤벨 per hand
+  side_lunge:  {base:'squat', ratio:0.22},  // 덤벨 per hand
+  box_step:    {base:'squat', ratio:0.22},  // 덤벨 per hand
   legext:      {base:'squat', ratio:0.35},
   step_up:     {base:'squat', ratio:0.22},  // 덤벨 per hand
+  sissy_squat: {base:'squat', ratio:null},  // 맨몸
+  wall_sit:    {base:'squat', ratio:null},  // 맨몸 (홀드)
   calf1:       {base:'squat', ratio:0.80},
+
   // ── Upper B (row 기반) ──
-  pulldown:    {base:'row', ratio:0.75},
-  pullup:      {base:'row', ratio:null},    // 맨몸
-  cable_pull:  {base:'row', ratio:0.27},
-  cablerow:    {base:'row', ratio:0.85},
-  db_row:      {base:'row', ratio:0.60},    // 덤벨 per arm
-  tbar_row:    {base:'row', ratio:0.85},
-  curl:        {base:'row', ratio:0.20},    // 덤벨 per arm
-  bar_curl:    {base:'row', ratio:0.32},
-  hammer:      {base:'row', ratio:0.18},    // 덤벨 per arm
-  facepull:    {base:'row', ratio:0.22},
+  pulldown:       {base:'row', ratio:0.75},
+  pullup:         {base:'row', ratio:null},  // 맨몸
+  cable_pull:     {base:'row', ratio:0.27},
+  pulldown_under: {base:'row', ratio:0.70},  // 언더그립 (약간 가벼움)
+  v_bar_pull:     {base:'row', ratio:0.78},  // V바
+  cablerow:       {base:'row', ratio:0.85},
+  db_row:         {base:'row', ratio:0.60},  // 덤벨 per arm
+  tbar_row:       {base:'row', ratio:0.85},
+  chest_row:      {base:'row', ratio:0.90},  // 가슴 지지 (안정적)
+  pendlay_row:    {base:'row', ratio:0.95},  // 폭발적 풀무빙
+  curl:           {base:'row', ratio:0.20},  // 덤벨 per arm
+  bar_curl:       {base:'row', ratio:0.32},
+  hammer:         {base:'row', ratio:0.18},  // 덤벨 per arm
+  preacher_curl:  {base:'row', ratio:0.30},  // EZ바
+  incline_curl:   {base:'row', ratio:0.16},  // 덤벨 per arm (불리한 각도)
+  facepull:       {base:'row', ratio:0.22},
+
   // ── Lower B (rdl 기반) ──
   legcurl:     {base:'rdl', ratio:0.32},
   legcurl_sit: {base:'rdl', ratio:0.28},
-  nordic:      {base:'rdl', ratio:null},    // 맨몸
+  nordic:      {base:'rdl', ratio:null},  // 맨몸
+  ghr:         {base:'rdl', ratio:null},  // 맨몸
+  stiff_dl:    {base:'rdl', ratio:0.92},  // RDL과 거의 동일
   hipthrust:   {base:'rdl', ratio:0.85},
-  cable_kick:  {base:'rdl', ratio:0.10},    // 케이블 per leg
+  cable_kick:  {base:'rdl', ratio:0.10},  // 케이블 per leg
   sumo_dl:     {base:'rdl', ratio:0.95},
+  conv_dl:     {base:'rdl', ratio:1.05},  // 컨벤셔널은 약간 무거움
+  back_ext:    {base:'rdl', ratio:0.25},  // 로딩 가능 가중
   calf2:       {base:'rdl', ratio:0.45},
 };
 
