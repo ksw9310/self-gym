@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>GymBack</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -391,17 +392,131 @@ let ST = {
   step:     1       // setup step
 };
 
-// ─── STORAGE ─────────────────────────────────────────────────────
-function load() {
-  try {
-    const s = localStorage.getItem('gb_s');
-    const h = localStorage.getItem('gb_h');
-    ST.settings = s ? JSON.parse(s) : null;
-    ST.history  = h ? JSON.parse(h) : [];
-  } catch(e) { ST.settings = null; ST.history = []; }
+// ─── STORAGE (Supabase) ──────────────────────────────────────────
+const SUPA_URL = 'https://bepfbsshoisuavgbjmzx.supabase.co';
+const SUPA_KEY = 'sb_publishable_gmVNI6ZV9cv_cUy8GERleA_UNyyrneQ';
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+function settingsFromRow(r) {
+  return {
+    startDate: r.start_date,
+    prevWeights: r.prev_weights || {},
+    manualPhase: r.manual_phase,
+    sessionCounts: r.session_counts || {}
+  };
 }
-function saveST() { localStorage.setItem('gb_s', JSON.stringify(ST.settings)); }
-function saveH()  { localStorage.setItem('gb_h', JSON.stringify(ST.history)); }
+
+function historyFromRows(rows) {
+  return (rows || []).map(r => ({
+    id: Number(r.id),
+    date: r.date,
+    workoutId: r.workout_id,
+    phase: r.phase,
+    timerSec: r.timer_sec || 0,
+    exercises: r.exercises
+  }));
+}
+
+async function load() {
+  try {
+    const [sRes, hRes] = await Promise.all([
+      sb.from('settings').select('*').eq('id','default').maybeSingle(),
+      sb.from('history').select('*').order('id', {ascending:true})
+    ]);
+    if (sRes.error && sRes.error.code !== 'PGRST116') throw sRes.error;
+    if (hRes.error) throw hRes.error;
+
+    if (sRes.data) {
+      ST.settings = settingsFromRow(sRes.data);
+      ST.history = historyFromRows(hRes.data);
+    } else {
+      ST.settings = null;
+      ST.history = [];
+      await migrateFromLS();
+    }
+  } catch (e) {
+    console.error('Supabase load failed, falling back to localStorage:', e);
+    try {
+      const s = localStorage.getItem('gb_s');
+      const h = localStorage.getItem('gb_h');
+      ST.settings = s ? JSON.parse(s) : null;
+      ST.history  = h ? JSON.parse(h) : [];
+    } catch(_) { ST.settings = null; ST.history = []; }
+  }
+}
+
+async function migrateFromLS() {
+  const sRaw = localStorage.getItem('gb_s');
+  if (!sRaw) return;
+  try {
+    const s = JSON.parse(sRaw);
+    ST.settings = {
+      startDate: s.startDate,
+      prevWeights: s.prevWeights || {},
+      manualPhase: s.manualPhase || null,
+      sessionCounts: s.sessionCounts || {}
+    };
+    await saveST();
+
+    const hRaw = localStorage.getItem('gb_h');
+    if (hRaw) {
+      const h = JSON.parse(hRaw);
+      if (h.length) {
+        await sb.from('history').upsert(h.map(r => ({
+          id: r.id,
+          date: r.date,
+          workout_id: r.workoutId,
+          phase: r.phase,
+          timer_sec: r.timerSec || 0,
+          exercises: r.exercises
+        })));
+        ST.history = h.map(r => ({...r}));
+      }
+    }
+    localStorage.removeItem('gb_s');
+    localStorage.removeItem('gb_h');
+  } catch (e) {
+    console.error('Migration failed:', e);
+  }
+}
+
+async function saveST() {
+  if (!ST.settings) return;
+  try {
+    const { error } = await sb.from('settings').upsert({
+      id: 'default',
+      start_date: ST.settings.startDate,
+      prev_weights: ST.settings.prevWeights || {},
+      manual_phase: ST.settings.manualPhase,
+      session_counts: ST.settings.sessionCounts || {},
+      updated_at: new Date().toISOString()
+    });
+    if (error) throw error;
+  } catch (e) { console.error('saveST failed:', e); }
+}
+
+async function addH(rec) {
+  try {
+    const { error } = await sb.from('history').upsert({
+      id: rec.id,
+      date: rec.date,
+      workout_id: rec.workoutId,
+      phase: rec.phase,
+      timer_sec: rec.timerSec || 0,
+      exercises: rec.exercises
+    });
+    if (error) throw error;
+  } catch (e) { console.error('addH failed:', e); }
+}
+
+async function wipeAll() {
+  try {
+    await Promise.all([
+      sb.from('history').delete().neq('id', 0),
+      sb.from('settings').delete().eq('id', 'default')
+    ]);
+  } catch (e) { console.error('wipeAll failed:', e); }
+}
 
 // ─── UTIL ─────────────────────────────────────────────────────────
 function today() {
@@ -818,9 +933,9 @@ function finishWo() {
   });
 
   ST.history.push(record);
-  saveH();
   if (!ST.settings.sessionCounts) ST.settings.sessionCounts = {};
   ST.settings.sessionCounts[aw.woId] = (ST.settings.sessionCounts[aw.woId] || 0) + 1;
+  addH(record);
   saveST();
   ST.active = null;
   showComplete(record);
@@ -1034,8 +1149,9 @@ function updPW(id, val) {
   saveST();
 }
 
-function resetApp() {
+async function resetApp() {
   if (!confirm('모든 기록과 설정이 삭제됩니다. 정말 초기화할까요?')) return;
+  await wipeAll();
   localStorage.removeItem('gb_s');
   localStorage.removeItem('gb_h');
   ST.settings = null; ST.history = []; ST.step = 1;
@@ -1043,9 +1159,21 @@ function resetApp() {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────
-load();
-if (ST.settings) go('today');
-else { ST.step = 1; renderSetup(); }
+function showLoading() {
+  const b = document.getElementById('setup-body');
+  if (b) b.innerHTML = `
+    <div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px">
+      <div style="font-size:32px;margin-bottom:8px">⏳</div>
+      불러오는 중...
+    </div>`;
+}
+
+(async () => {
+  showLoading();
+  await load();
+  if (ST.settings) go('today');
+  else { ST.step = 1; renderSetup(); }
+})();
 </script>
 </body>
 </html>
