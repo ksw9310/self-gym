@@ -214,47 +214,104 @@ body {
 
 <script>
 // ─── DATA ────────────────────────────────────────────────────────
+// pool 배열을 가진 슬롯은 세션마다 다른 운동으로 로테이션됨
 const WO = {
   upperA: {
     id:'upperA', name:'Upper A', sub:'밀기 중심', icon:'💪',
     ex:[
-      {id:'bench',      name:'벤치프레스',               tip:'견갑골 고정, 바 경로 일직선'},
-      {id:'incline',    name:'인클라인 덤벨 프레스',       tip:'45도 각도, 가슴 스트레치 느끼기'},
-      {id:'shoulder',   name:'숄더 프레스 (덤벨)',         tip:'코어 브레이싱, 허리 과신전 금지'},
-      {id:'lateral',    name:'케이블 사이드 레터럴',        tip:'팔꿈치 약간 구부린 채 올리기'},
-      {id:'tricep',     name:'트라이셉스 푸시다운',         tip:'팔꿈치 고정'}
+      {id:'bench', name:'벤치프레스', tip:'견갑골 고정, 바 경로 일직선', main:true},
+      {pool:[
+        {id:'incline',     name:'인클라인 덤벨 프레스', tip:'45도 각도, 가슴 스트레치'},
+        {id:'incline_bar', name:'인클라인 바벨 프레스', tip:'중간 그립, 가슴 상부 집중'},
+        {id:'cable_fly',   name:'케이블 크로스오버',   tip:'수평 내전, 팔꿈치 살짝 굽히기'},
+      ]},
+      {pool:[
+        {id:'shoulder', name:'숄더 프레스 (덤벨)',    tip:'코어 브레이싱, 허리 과신전 금지'},
+        {id:'ohp',      name:'오버헤드 프레스 (바벨)', tip:'코어 단단히, 바를 얼굴 앞으로'},
+        {id:'arnold',   name:'아놀드 프레스',         tip:'회전하며 올리기, 전면 삼각근'},
+      ]},
+      {pool:[
+        {id:'lateral',     name:'케이블 사이드 레터럴',   tip:'팔꿈치 약간 구부린 채 올리기'},
+        {id:'db_lateral',  name:'덤벨 사이드 레터럴',    tip:'엄지 아래, 팔꿈치 주도'},
+        {id:'upright_row', name:'업라이트 로우 (케이블)', tip:'팔꿈치 높이 올리기, 어깨너비 그립'},
+      ]},
+      {pool:[
+        {id:'tricep',      name:'트라이셉스 푸시다운', tip:'팔꿈치 고정, 완전 신전'},
+        {id:'tricep_oh',   name:'오버헤드 트라이셉스', tip:'팔꿈치 안으로, 스트레치 극대화'},
+        {id:'tricep_kick', name:'덤벨 킥백',          tip:'전완 수평, 완전 신전', note:'각 팔'},
+      ]},
     ]
   },
   lowerA: {
     id:'lowerA', name:'Lower A', sub:'전면 허벅지 중심', icon:'🦵',
     ex:[
-      {id:'squat',      name:'스쿼트',                   tip:'폼 완벽히 체크, 무릎이 발끝 방향으로'},
-      {id:'legpress',   name:'레그 프레스',               tip:'발 위치 조정 후 무릎 방향 확인'},
-      {id:'bulgarian',  name:'불가리안 스플릿 스쿼트',      tip:'밸런스 잡으며 천천히', note:'각 다리'},
-      {id:'legext',     name:'레그 익스텐션',              tip:'완전 가동범위'},
-      {id:'calf1',      name:'카프 레이즈',               tip:'최하단에서 스트레치'}
+      {id:'squat', name:'스쿼트', tip:'폼 완벽히 체크, 무릎이 발끝 방향으로', main:true},
+      {pool:[
+        {id:'legpress',   name:'레그 프레스',   tip:'발 위치 조정 후 무릎 방향 확인'},
+        {id:'hack_squat', name:'핵 스쿼트',     tip:'무릎 추적, 깊이 있게'},
+        {id:'goblet',     name:'고블릿 스쿼트', tip:'덤벨 들고, 무릎 바깥으로'},
+      ]},
+      {pool:[
+        {id:'bulgarian', name:'불가리안 스플릿 스쿼트', tip:'밸런스 잡으며 천천히', note:'각 다리'},
+        {id:'lunge',     name:'워킹 런지 (덤벨)',      tip:'앞발 무릎 90도, 몸통 수직', note:'각 다리'},
+        {id:'rev_lunge', name:'리버스 런지 (덤벨)',     tip:'뒷발 밀어내기, 앞 허벅지 집중', note:'각 다리'},
+      ]},
+      {pool:[
+        {id:'legext',  name:'레그 익스텐션',  tip:'완전 가동범위, 수축 1초 유지'},
+        {id:'step_up', name:'스텝업 (덤벨)', tip:'발 전체로 밟기, 앞 다리로 밀기', note:'각 다리'},
+      ]},
+      {id:'calf1', name:'카프 레이즈 (선 자세)', tip:'최하단에서 스트레치, 발 정면'},
     ]
   },
   upperB: {
     id:'upperB', name:'Upper B', sub:'당기기 중심', icon:'🏋️',
     ex:[
-      {id:'row',        name:'바벨 로우',                 tip:'허리 중립, 견갑골 당기기'},
-      {id:'pulldown',   name:'랫 풀다운',                 tip:'가슴까지, 날개뼈 수축'},
-      {id:'cablerow',   name:'시티드 케이블 로우',          tip:'후면 삼각근·광배근'},
-      {id:'curl',       name:'덤벨 컬',                   tip:'이두 최대 수축'},
-      {id:'facepull',   name:'페이스 풀',                 tip:'어깨 건강, 외회전근'}
+      {id:'row', name:'바벨 로우', tip:'허리 중립, 견갑골 당기기', main:true},
+      {pool:[
+        {id:'pulldown',   name:'랫 풀다운',           tip:'가슴까지, 날개뼈 수축'},
+        {id:'pullup',     name:'풀업 / 친업',          tip:'완전 신전 → 완전 수축'},
+        {id:'cable_pull', name:'스트레이트 암 풀다운',  tip:'팔 편 채 광배근으로 당기기'},
+      ]},
+      {pool:[
+        {id:'cablerow', name:'시티드 케이블 로우', tip:'후면 삼각근·광배근'},
+        {id:'db_row',   name:'원암 덤벨 로우',     tip:'로테이션 없이 팔꿈치로 당기기', note:'각 팔'},
+        {id:'tbar_row', name:'T바 로우',           tip:'가슴 지지, 날개뼈 수축'},
+      ]},
+      {pool:[
+        {id:'curl',     name:'덤벨 컬',  tip:'이두 최대 수축, 팔꿈치 고정'},
+        {id:'bar_curl', name:'바벨 컬',  tip:'상완 고정, 완전 수축'},
+        {id:'hammer',   name:'해머 컬',  tip:'중립 그립, 상완근·이두 자극'},
+      ]},
+      {id:'facepull', name:'페이스 풀', tip:'어깨 건강, 외회전근 활성화'},
     ]
   },
   lowerB: {
     id:'lowerB', name:'Lower B', sub:'후면 사슬 중심', icon:'🔥',
     ex:[
-      {id:'rdl',        name:'루마니안 데드리프트',          tip:'햄스트링 스트레치, 허리 아치 유지'},
-      {id:'legcurl',    name:'레그 컬 (머신)',              tip:'완전 가동범위'},
-      {id:'hipthrust',  name:'힙 쓰러스트',                tip:'힙 최대 수축'},
-      {id:'calf2',      name:'카프 레이즈 (앉아서)',         tip:'비복근·가자미근 분리'}
+      {id:'rdl', name:'루마니안 데드리프트', tip:'햄스트링 스트레치, 허리 아치 유지', main:true},
+      {pool:[
+        {id:'legcurl',     name:'레그 컬 (누워서)', tip:'완전 가동범위, 수축 유지'},
+        {id:'legcurl_sit', name:'레그 컬 (앉아서)', tip:'엉덩이 굴곡 자세, 긴 가동범위'},
+        {id:'nordic',      name:'노르딕 컬',        tip:'천천히 내려가기, 편심 집중'},
+      ]},
+      {pool:[
+        {id:'hipthrust',  name:'힙 쓰러스트',    tip:'힙 최대 수축, 허리 과신전 금지'},
+        {id:'cable_kick', name:'케이블 킥백',     tip:'힙 익스텐션, 둔근 수축', note:'각 다리'},
+        {id:'sumo_dl',    name:'스모 데드리프트', tip:'넓은 스탠스, 내전근 자극'},
+      ]},
+      {id:'calf2', name:'카프 레이즈 (앉아서)', tip:'비복근·가자미근 분리 자극'},
     ]
   }
 };
+
+// 히스토리 조회용 전체 운동 ID → 정보 맵
+const ALL_EX = {};
+Object.values(WO).forEach(wo => {
+  wo.ex.forEach(slot => {
+    if (slot.pool) slot.pool.forEach(ex => { ALL_EX[ex.id] = ex; });
+    else ALL_EX[slot.id] = slot;
+  });
+});
 
 const SCHED = ['upperA','lowerA','rest','upperB','lowerB','rest','rest'];
 
@@ -265,6 +322,52 @@ const SETS = {
   3: {upperA:[4,4,4,3,3], lowerA:[4,4,4,4,3], upperB:[4,4,4,4,3], lowerB:[4,4,4,3]}
 };
 
+// 서브 운동 → 메인 무게 기반 추천 비율 (직접 입력 없을 때 자동 계산)
+const EX_BASE = {
+  // ── Upper A (bench 기반) ──
+  incline:     {base:'bench', ratio:0.35},  // 덤벨 per hand
+  incline_bar: {base:'bench', ratio:0.82},  // 바벨
+  cable_fly:   {base:'bench', ratio:0.22},  // 케이블 per side
+  shoulder:    {base:'bench', ratio:0.45},  // 덤벨 per hand
+  ohp:         {base:'bench', ratio:0.62},  // 바벨
+  arnold:      {base:'bench', ratio:0.40},  // 덤벨 per hand
+  lateral:     {base:'bench', ratio:0.10},  // 케이블 per side
+  db_lateral:  {base:'bench', ratio:0.08},  // 덤벨 per hand
+  upright_row: {base:'bench', ratio:0.35},
+  tricep:      {base:'bench', ratio:0.20},
+  tricep_oh:   {base:'bench', ratio:0.18},
+  tricep_kick: {base:'bench', ratio:0.12},  // 덤벨 per hand
+  // ── Lower A (squat 기반) ──
+  legpress:    {base:'squat', ratio:2.20},
+  hack_squat:  {base:'squat', ratio:0.88},
+  goblet:      {base:'squat', ratio:0.25},  // 덤벨 1개
+  bulgarian:   {base:'squat', ratio:0.30},  // 덤벨 per hand
+  lunge:       {base:'squat', ratio:0.25},  // 덤벨 per hand
+  rev_lunge:   {base:'squat', ratio:0.25},  // 덤벨 per hand
+  legext:      {base:'squat', ratio:0.35},
+  step_up:     {base:'squat', ratio:0.22},  // 덤벨 per hand
+  calf1:       {base:'squat', ratio:0.80},
+  // ── Upper B (row 기반) ──
+  pulldown:    {base:'row', ratio:0.75},
+  pullup:      {base:'row', ratio:null},    // 맨몸
+  cable_pull:  {base:'row', ratio:0.27},
+  cablerow:    {base:'row', ratio:0.85},
+  db_row:      {base:'row', ratio:0.60},    // 덤벨 per arm
+  tbar_row:    {base:'row', ratio:0.85},
+  curl:        {base:'row', ratio:0.20},    // 덤벨 per arm
+  bar_curl:    {base:'row', ratio:0.32},
+  hammer:      {base:'row', ratio:0.18},    // 덤벨 per arm
+  facepull:    {base:'row', ratio:0.22},
+  // ── Lower B (rdl 기반) ──
+  legcurl:     {base:'rdl', ratio:0.32},
+  legcurl_sit: {base:'rdl', ratio:0.28},
+  nordic:      {base:'rdl', ratio:null},    // 맨몸
+  hipthrust:   {base:'rdl', ratio:0.85},
+  cable_kick:  {base:'rdl', ratio:0.10},    // 케이블 per leg
+  sumo_dl:     {base:'rdl', ratio:0.95},
+  calf2:       {base:'rdl', ratio:0.45},
+};
+
 const PHASE = {
   1:{name:'적응기',  wk:'1~2주차', col:'#4ADE80', reps:'12~15', note:'이전 무게의 50~60%', pct:0.55},
   2:{name:'빌딩기',  wk:'3~4주차', col:'#FB923C', reps:'8~12',  note:'이전 무게의 65~75%', pct:0.70},
@@ -272,10 +375,10 @@ const PHASE = {
 };
 
 const MAIN_LIFTS = [
-  {id:'bench',  name:'벤치프레스',       icon:'🏋️'},
-  {id:'squat',  name:'스쿼트',           icon:'🦵'},
-  {id:'rdl',    name:'데드리프트 / RDL',  icon:'🔥'},
-  {id:'row',    name:'바벨 로우',         icon:'💪'}
+  {id:'bench', name:'벤치프레스',       icon:'🏋️'},
+  {id:'squat', name:'스쿼트',           icon:'🦵'},
+  {id:'rdl',   name:'데드리프트 / RDL',  icon:'🔥'},
+  {id:'row',   name:'바벨 로우',         icon:'💪'}
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
@@ -340,8 +443,29 @@ function fmtTime(sec) {
 
 function recWeight(exId, phase) {
   const prev = ST.settings?.prevWeights?.[exId];
-  if (!prev) return null;
-  return Math.round(prev * PHASE[phase].pct / 2.5) * 2.5;
+  if (prev) return Math.round(prev * PHASE[phase].pct / 2.5) * 2.5;
+  const rel = EX_BASE[exId];
+  if (!rel?.ratio) return null;
+  const basePrev = ST.settings?.prevWeights?.[rel.base];
+  if (!basePrev) return null;
+  return Math.round(basePrev * rel.ratio * PHASE[phase].pct / 2.5) * 2.5;
+}
+
+function recWeightLabel(exId, phase) {
+  const rw = recWeight(exId, phase);
+  if (!rw) return null;
+  if (ST.settings?.prevWeights?.[exId]) {
+    return `추천 ${rw}kg (이전의 ${Math.round(PHASE[phase].pct*100)}%)`;
+  }
+  const rel = EX_BASE[exId];
+  const baseName = MAIN_LIFTS.find(m => m.id === rel?.base)?.name || rel?.base;
+  return `추천 ${rw}kg (${baseName} 기준)`;
+}
+
+// 세션 카운트 기반으로 pool 슬롯을 실제 운동으로 해석
+function getWorkoutExercises(woId) {
+  const cnt = ST.settings?.sessionCounts?.[woId] || 0;
+  return WO[woId].ex.map(slot => slot.pool ? slot.pool[cnt % slot.pool.length] : slot);
 }
 
 function lastRecord(woId) {
@@ -408,22 +532,21 @@ function renderSetup() {
       </div>`;
   } else {
     b.innerHTML = `
-      <div style="padding:0 14px 8px">
-        <div style="font-weight:700;font-size:15px;margin-bottom:4px">이전 작업 무게 입력 <span style="color:var(--muted);font-weight:400;font-size:12px">(선택)</span></div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6">공백 전 마지막으로 들던 무게를 운동별로 입력하면 페이즈별 추천 무게를 자동 계산해드려요. 모르는 건 비워도 됩니다.</div>
+      <div class="card">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px">메인 리프트 무게 입력 <span style="color:var(--muted);font-weight:400;font-size:12px">(선택)</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+          공백 전 마지막으로 들던 무게를 입력하면 페이즈별 추천 무게를 자동 계산해드려요.<br>
+          <span style="color:var(--primary)">서브 운동 무게는 메인 무게 기준으로 자동 계산됩니다.</span>
+        </div>
+        ${MAIN_LIFTS.map(l=>`
+          <div style="margin-bottom:12px">
+            <div class="inp-label">${l.icon} ${l.name}</div>
+            <div style="position:relative">
+              <input type="number" id="pw-${l.id}" class="inp" placeholder="입력 없으면 건너뜀" min="0" step="2.5" style="padding-right:46px">
+              <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">kg</span>
+            </div>
+          </div>`).join('')}
       </div>
-      ${Object.values(WO).map(wo=>`
-        <div class="sec">${wo.icon} ${wo.name} — ${wo.sub}</div>
-        <div class="card">
-          ${wo.ex.map(ex=>`
-            <div style="margin-bottom:12px">
-              <div class="inp-label">${ex.name}${ex.note?` <span style="font-weight:400">(${ex.note})</span>`:''}</div>
-              <div style="position:relative">
-                <input type="number" id="pw-${ex.id}" class="inp" placeholder="입력 없으면 건너뜀" min="0" step="0.5" style="padding-right:46px">
-                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">kg</span>
-              </div>
-            </div>`).join('')}
-        </div>`).join('')}
       <div style="margin:14px;display:flex;gap:10px">
         <button class="btn btn-ghost" onclick="ST.step=1;renderSetup()" style="flex:1">← 뒤로</button>
         <button class="btn btn-primary" onclick="setupFinish()" style="flex:2">시작하기 🚀</button>
@@ -439,13 +562,11 @@ function setupNext() {
 
 function setupFinish() {
   const pw = {};
-  Object.values(WO).forEach(wo => {
-    wo.ex.forEach(ex => {
-      const v = parseFloat(document.getElementById(`pw-${ex.id}`)?.value);
-      if (v > 0) pw[ex.id] = v;
-    });
+  MAIN_LIFTS.forEach(l => {
+    const v = parseFloat(document.getElementById(`pw-${l.id}`)?.value);
+    if (v > 0) pw[l.id] = v;
   });
-  ST.settings = { startDate: ST._date, prevWeights: pw, manualPhase: null };
+  ST.settings = { startDate: ST._date, prevWeights: pw, manualPhase: null, sessionCounts: {} };
   saveST();
   go('today');
 }
@@ -498,18 +619,28 @@ function renderToday() {
     </div>
     <div class="sec">오늘의 운동 목록</div>`;
 
-  wo.ex.forEach((ex, i) => {
+  const exList = getWorkoutExercises(woId);
+  const sessionNum = (ST.settings?.sessionCounts?.[woId] || 0) + 1;
+  html += `<div style="padding:4px 18px 2px;display:flex;align-items:center;gap:6px">
+    <span style="font-size:11px;color:var(--muted)">오늘 루틴 #${sessionNum}</span>
+  </div>`;
+
+  exList.forEach((ex, i) => {
     const sets = (SETS[phase][woId] || [])[i] || 3;
-    const rw = recWeight(ex.id, phase);
+    const rwLabel = recWeightLabel(ex.id, phase);
     const prevSets = last?.exercises?.[ex.id];
     const prevStr = fmtSets(prevSets);
+    const isPool = WO[woId].ex[i].pool;
     html += `
       <div class="card" style="padding:14px 16px">
         <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-weight:600;font-size:14px">${ex.name}${ex.note?` <span style="font-size:11px;color:var(--muted)">(${ex.note})</span>`:''}</span>
+          <div>
+            <span style="font-weight:600;font-size:14px">${ex.name}${ex.note?` <span style="font-size:11px;color:var(--muted)">(${ex.note})</span>`:''}</span>
+            ${isPool ? `<span style="font-size:10px;color:var(--muted);margin-left:6px;background:var(--card2);padding:2px 6px;border-radius:6px">순환</span>` : ''}
+          </div>
           <span style="font-size:12px;color:var(--muted)">${sets}세트 × ${pi.reps}회</span>
         </div>
-        ${rw ? `<div style="font-size:12px;color:var(--primary);margin-top:4px">추천 ${rw}kg (이전의 ${Math.round(pi.pct*100)}%)</div>` : ''}
+        ${rwLabel ? `<div style="font-size:12px;color:var(--primary);margin-top:4px">${rwLabel}</div>` : ''}
         ${prevStr ? `<div class="prev">지난 기록: ${prevStr}</div>` : ''}
       </div>`;
   });
@@ -551,7 +682,7 @@ function startWo(woId) {
 
   ST.active = {
     woId, phase,
-    exercises: wo.ex.map((ex, i) => {
+    exercises: getWorkoutExercises(woId).map((ex, i) => {
       const sc = (SETS[phase][woId] || [])[i] || 3;
       const rw = recWeight(ex.id, phase) || '';
       const prevSets = last?.exercises?.[ex.id] || [];
@@ -688,6 +819,9 @@ function finishWo() {
 
   ST.history.push(record);
   saveH();
+  if (!ST.settings.sessionCounts) ST.settings.sessionCounts = {};
+  ST.settings.sessionCounts[aw.woId] = (ST.settings.sessionCounts[aw.woId] || 0) + 1;
+  saveST();
   ST.active = null;
   showComplete(record);
 }
@@ -786,22 +920,21 @@ function showHistDetail(id) {
       <div class="stat-card"><div class="stat-val">${vol.toLocaleString()}</div><div class="stat-lbl">총 볼륨(kg)</div></div>
     </div>`;
 
-  if (wo) {
-    wo.ex.forEach(ex => {
-      const sets = rec.exercises[ex.id]?.filter(s => s.done);
-      if (!sets?.length) return;
-      html += `
-        <div class="card">
-          <div style="font-weight:700;margin-bottom:10px">${ex.name}</div>
-          ${sets.map((s,i) => `
-            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
-              <span style="color:var(--muted);font-size:13px">세트 ${i+1}</span>
-              <span style="font-weight:600">${s.w}kg × ${s.r}회</span>
-              <span style="color:var(--muted);font-size:12px">${Math.round(s.w*s.r)}kg</span>
-            </div>`).join('')}
-        </div>`;
-    });
-  }
+  Object.keys(rec.exercises).forEach(exId => {
+    const ex = ALL_EX[exId] || {name: exId, note: null};
+    const sets = rec.exercises[exId].filter(s => s.done);
+    if (!sets.length) return;
+    html += `
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:10px">${ex.name}${ex.note?` <span style="font-size:11px;color:var(--muted);font-weight:400">(${ex.note})</span>`:''}</div>
+        ${sets.map((s,i) => `
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted);font-size:13px">세트 ${i+1}</span>
+            <span style="font-weight:600">${s.w}kg × ${s.r}회</span>
+            <span style="color:var(--muted);font-size:12px">${Math.round(s.w*s.r)}kg</span>
+          </div>`).join('')}
+      </div>`;
+  });
 
   document.getElementById('hist-body').innerHTML = html;
 }
@@ -849,22 +982,38 @@ function renderSettings() {
         </button>` : ''}
     </div>
 
-    <div class="sec">이전 작업 무게 수정</div>
-    <div style="padding:0 14px 4px;font-size:12px;color:var(--muted)">수정하면 각 운동의 추천 무게가 다시 계산돼요</div>
-    ${Object.values(WO).map(wo=>`
-      <div class="sec" style="padding-top:12px">${wo.icon} ${wo.name} — ${wo.sub}</div>
-      <div class="card">
-        ${wo.ex.map(ex=>`
-          <div style="margin-bottom:12px">
-            <div class="inp-label">${ex.name}${ex.note?` (${ex.note})`:''}</div>
-            <div style="position:relative">
-              <input type="number" class="inp" value="${ST.settings.prevWeights?.[ex.id]||''}"
-                placeholder="미입력" min="0" step="0.5" style="padding-right:46px"
-                onchange="updPW('${ex.id}',this.value)">
-              <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">kg</span>
-            </div>
-          </div>`).join('')}
-      </div>`).join('')}
+    <div class="sec">메인 리프트 무게 수정</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">수정하면 서브 운동 추천 무게가 모두 다시 계산돼요</div>
+      ${MAIN_LIFTS.map(l=>`
+        <div style="margin-bottom:12px">
+          <div class="inp-label">${l.icon} ${l.name}</div>
+          <div style="position:relative">
+            <input type="number" class="inp" value="${ST.settings.prevWeights?.[l.id]||''}"
+              placeholder="미입력" min="0" step="2.5" style="padding-right:46px"
+              onchange="updPW('${l.id}',this.value)">
+            <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px">kg</span>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="sec">운동 로테이션 현황</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">서브 운동은 세션마다 자동으로 바뀝니다</div>
+      ${Object.values(WO).map(wo => {
+        const cnt = ST.settings.sessionCounts?.[wo.id] || 0;
+        const exList = getWorkoutExercises(wo.id);
+        const poolSlots = wo.ex.filter(s => s.pool);
+        return `
+          <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">${wo.icon} ${wo.name} <span style="color:var(--muted);font-size:11px;font-weight:400">#${cnt+1}회차</span></div>
+            ${poolSlots.map((slot, si) => {
+              const resolvedEx = exList[wo.ex.indexOf(slot)];
+              return `<div style="font-size:12px;color:var(--muted);margin-top:3px">↻ ${resolvedEx?.name || ''}</div>`;
+            }).join('')}
+          </div>`;
+      }).join('')}
+    </div>
 
     <div class="sec">초기화</div>
     <div style="margin:0 14px 14px">
